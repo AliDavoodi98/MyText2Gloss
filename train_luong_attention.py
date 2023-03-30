@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument("--rnn_cell", default="GRU")
     parser.add_argument("--use_cuda", action="store_true")
     parser.add_argument("--use_batch_attention", action="store_true")
+    parser.add_argument("--model_save_path", required=True)
     args = parser.parse_args()
 
     log_level = logging.getLevelName(args.log_level)
@@ -107,6 +108,13 @@ def main():
               args.teacher_forcing_ratio,
               args.use_cuda,
               )
+    
+    torch.save({
+    'encoder_state_dict': encoder.state_dict(),
+    'decoder_state_dict': decoder.state_dict(),
+    'encoder_optimizer_state_dict': encoder_optimizer.state_dict(),
+    'decoder_optimizer_state_dict': decoder_optimizer.state_dict(),
+    }, args.model_save_path)
 
 
 def run_train(n_epochs,
@@ -225,7 +233,7 @@ def run_train(n_epochs,
                          batch_size,
                          use_cuda=use_cuda)
 
-            logging.info(f"LOSS: {loss}")
+            logging.info(f"[{i+1}] LOSS: {loss}")
 
 
 def run_eval(encoder_embedding_map,
